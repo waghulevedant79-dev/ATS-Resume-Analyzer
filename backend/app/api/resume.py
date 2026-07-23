@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app.db.database import SessionLocal
-from app.services.resume_service import create_resume
-from app.schemas.resume import ResumeUploadResponse
+from app.services.resume_service import upload_and_parse_resume
+from app.schemas.resume import ResumeUploadParseResponse
 from app.db.dependencies import get_db
 
 router = APIRouter(
@@ -14,7 +14,7 @@ router = APIRouter(
 
 @router.post(
     "/upload",
-    response_model=ResumeUploadResponse,
+    response_model=ResumeUploadParseResponse,
     status_code=201
 )
 def upolad_resume(
@@ -25,11 +25,10 @@ def upolad_resume(
     Upload resume and store its metadata.
     """
     
-    resume = create_resume(db, file)
+    resume = upload_and_parse_resume(db, file)
     
-    return ResumeUploadResponse (
+    return ResumeUploadParseResponse (
         message= "Resume uploaded successfully.",
-        resume_id= resume.id,
-        original_filename= resume.original_filename,
-        stored_filename= resume.stored_filename,
+        resume_id=resume["resume_id"],
+        parsed_resume=resume["parsed_resume"],
     )

@@ -1,12 +1,12 @@
 from pydantic import BaseModel
+from typing import Any
 
 
-class ResumeUploadResponse(BaseModel):
+class ResumeUploadParseResponse(BaseModel):
     """
-    Response returned after a successful resume upload.
+    Response returned after a successful resume upload and parsed.
     """
 
     message: str
     resume_id: int
-    original_filename: str
-    stored_filename: str
+    parsed_resume: dict[str, Any]

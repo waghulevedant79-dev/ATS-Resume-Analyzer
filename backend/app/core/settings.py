@@ -10,8 +10,6 @@ class Settings(BaseSettings):
     
     DEBUG: bool = False
     
-    MAX_FILE_SIZE: str
-    
     UPLOAD_DIR: str
     
     class Config:

@@ -5,6 +5,7 @@ from app.core.settings import settings
 
 UPLOAD_DIR = Path(settings.UPLOAD_DIR)
 
+MAX_FILE_SIZE = 10 * 1024 * 1024
 
 ALLOWED_EXTENSION = {
     ".pdf",
@@ -60,7 +61,7 @@ def save_file(file: UploadFile) -> dict:
     
     validate_extension(file)
     
-    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    UPLOAD_DIR.mkdir(exist_ok=True)
     
     stored_filename = generate_unique_filename(file.filename)
     
@@ -69,7 +70,7 @@ def save_file(file: UploadFile) -> dict:
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    if size > settings.MAX_FILE_SIZE:
+    if size > MAX_FILE_SIZE:
         raise HTTPException(
         status_code=400,
         detail="Maximum allowed file size is 10 MB."
