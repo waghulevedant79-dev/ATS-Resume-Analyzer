@@ -1,46 +1,97 @@
 SECTION_HEADINGS = {
 
-    "experience": [
+    "summary": {
+        "summary",
+        "professional summary",
+        "professional profile",
+        "profile",
+        "career profile",
+        "executive summary",
+        "about me",
+        "about",
+        "objective",
+        "career objective",
+        "professional objective",
+        "career goals",
+        "personal profile",
+        "introduction",
+        "overview",
+        "bio",
+        "personal statement"
+    },
+
+    "experience": {
         "experience",
         "work experience",
         "professional experience",
         "employment history",
         "employment",
         "career history",
+        "work history",
+        "professional background",
+        "work background",
         "internship",
         "internships",
-        "professional background"
-    ],
+        "internship experience",
+        "industry experience",
+        "relevant experience",
+        "career experience",
+        "job experience",
+        "employment experience",
+        "positions held",
+        "work profile",
+        "professional employment"
+    },
 
-    "education": [
+    "education": {
         "education",
         "academic background",
         "academic qualification",
         "academic qualifications",
+        "educational qualification",
+        "educational qualifications",
         "qualification",
         "qualifications",
-        "educational qualification",
-        "educational qualifications"
-    ],
+        "academic history",
+        "education details",
+        "educational background",
+        "education & qualifications",
+        "scholastic details",
+        "academics",
+        "academic details"
+    },
 
-    "skills": [
+    "skills": {
         "skills",
         "skill",
         "technical skills",
         "technical skill",
         "technical competencies",
+        "technical expertise",
+        "technical proficiency",
+        "technical knowledge",
+        "professional skills",
         "core skills",
         "core competencies",
         "key skills",
-        "professional skills",
-        "areas of expertise",
+        "competencies",
         "expertise",
-        "technologies",
+        "areas of expertise",
+        "areas of specialization",
+        "strengths",
+        "technical strengths",
+        "skill set",
         "technology stack",
-        "tech stack"
-    ],
+        "tech stack",
+        "technologies",
+        "tools",
+        "software skills",
+        "computer skills",
+        "programming skills",
+        "development skills"
+    },
 
-    "projects": [
+    "projects": {
         "project",
         "projects",
         "personal project",
@@ -50,36 +101,57 @@ SECTION_HEADINGS = {
         "major project",
         "major projects",
         "key projects",
-        "featured projects"
-    ],
+        "featured projects",
+        "project experience",
+        "project work",
+        "project portfolio",
+        "portfolio projects",
+        "relevant projects",
+        "selected projects",
+        "notable projects",
+        "research projects",
+        "case studies"
+    },
 
-    "certifications": [
+    "certifications": {
         "certificate",
         "certificates",
         "certification",
         "certifications",
+        "professional certification",
+        "professional certifications",
         "licenses",
         "license",
-        "professional certifications"
-    ],
+        "licences",
+        "licence",
+        "credentials",
+        "professional credentials",
+        "courses",
+        "completed courses",
+        "online courses",
+        "training",
+        "training & certifications",
+        "achievements & certifications"
+    },
 
-    "languages": [
+    "languages": {
         "language",
-        "languages"
-    ],
+        "languages",
+        "language proficiency",
+        "spoken languages",
+        "known languages"
+    },
 
-    "interests": [
+    "interests": {
         "interests",
+        "interest",
         "hobbies",
-        "hobbies & interests"
-    ],
-
-    "summary": [
-        "summary",
-        "professional summary",
-        "profile",
-        "career objective",
-        "objective",
-        "about me"
-    ],
+        "hobbies & interests",
+        "personal interests",
+        "extracurricular activities",
+        "activities",
+        "co-curricular activities",
+        "extra curricular activities",
+        "leisure interests"
+    }
 }

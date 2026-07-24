@@ -8,6 +8,7 @@ import logging
 import os
 
 from app.parsers.parser import parse_resume
+from app.scoring.scorer import calculate_ats_score
 
 logger = logging.getLogger(__name__)
 
@@ -54,13 +55,19 @@ def create_resume(
         )
 
 
-def upload_and_parse_resume(
+def process_uploaded_resume(
     db: Session,
     file: UploadFile
 ):
     """
-    Upload a resume, save its metadata,
-    parse the resume and return both.
+    Process an uploaded resume.
+
+    Workflow:
+    1. Save uploaded file
+    2. Store resume metadata
+    3. Parse the resume
+    4. Calculate ATS score
+    5. Return processed result
     """
 
     try:
@@ -70,11 +77,15 @@ def upload_and_parse_resume(
 
         # Parse resume
         parsed_resume = parse_resume(resume.file_path)
+        
+        # calculating ats score
+        ats_score = calculate_ats_score(parsed_resume)
 
         return {
             "message": "Resume uploaded successfully.",
             "resume_id": resume.id,
-            "parsed_resume": parsed_resume
+            "parsed_resume": parsed_resume,
+            "ats_score": ats_score
         }
 
     except Exception as e:
@@ -96,3 +107,5 @@ def upload_and_parse_resume(
             status_code=500,
             detail="Failed to process resume."
         )
+
+

@@ -1,5 +1,7 @@
 import re
 from app.parsers.constants import SECTION_HEADINGS
+from app.parsers.utils import normalize_heading
+
 
 def extract_email(text: str) -> str | None:
     """
@@ -67,7 +69,8 @@ def extract_sections(text: str) -> dict:
         "education": [],
         "experience": [],
         "projects": [],
-        "certifications": []
+        "certifications": [],
+        "summary": []
     }
 
     current_section = None
@@ -81,7 +84,7 @@ def extract_sections(text: str) -> dict:
         if not line:
             continue
             
-        normalized_line = re.sub(r"[:\-]+$", "", line.strip().lower())
+        normalized_line = normalize_heading(line)
 
         heading_found = False
 
@@ -120,7 +123,7 @@ def extract_name(text: str) -> str | None:
 
     for line in lines[:5]:
 
-        normalized = re.sub(r"[:\-]+$", "", line.lower().strip())
+        normalized = normalize_heading(line)
 
         if "@" in line:
             continue

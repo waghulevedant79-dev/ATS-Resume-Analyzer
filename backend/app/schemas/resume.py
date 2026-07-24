@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from typing import Any
+from app.schemas.ats_score import ATSScoreResponse
+from app.schemas.parser import ParsedResume
 
 
 class ResumeUploadParseResponse(BaseModel):
@@ -9,4 +11,15 @@ class ResumeUploadParseResponse(BaseModel):
 
     message: str
     resume_id: int
-    parsed_resume: dict[str, Any]
+    parsed_resume: ParsedResume
+
+
+class ProcessResumeResponse(BaseModel):
+    """
+    Response returned after a successful resume parsed and calculate ats score.
+    """
+
+    message: str
+    resume_id: int
+    parsed_resume: ParsedResume
+    ats_score: ATSScoreResponse
