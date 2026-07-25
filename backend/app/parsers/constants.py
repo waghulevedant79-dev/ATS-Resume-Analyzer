@@ -155,3 +155,80 @@ SECTION_HEADINGS = {
         "leisure interests"
     }
 }
+
+
+SKILL_CATEGORY_PREFIXES = {
+    "front-end",
+    "frontend",
+    "back-end",
+    "backend",
+    "database",
+    "databases",
+    "tools",
+    "frameworks",
+    "framework",
+    "libraries",
+    "library",
+    "languages",
+    "language",
+    "cloud",
+    "devops",
+    "ai",
+    "machine learning",
+    "ai / machine learning",
+    "artificial intelligence",
+}
+
+
+BULLET_PREFIXES = (
+    "•",
+    "-",
+    "▪",
+    "◦",
+    "●",
+    "○",
+)
+
+
+SKILL_CATEGORY_PREFIXES = {
+    "frontend",
+    "front-end",
+    "backend",
+    "back-end",
+    "database",
+    "databases",
+    "tools",
+    "tool",
+    "languages",
+    "language",
+    "framework",
+    "frameworks",
+    "libraries",
+    "library",
+    "technologies",
+    "technology",
+    "cloud",
+    "devops",
+    "testing",
+    "version control",
+    "ai",
+    "machine learning",
+    "artificial intelligence",
+}
+
+
+SKILL_DELIMITERS = (
+    "|",
+    ";",
+)
+
+
+IGNORED_SKILL_VALUES = {
+    "",
+    "-",
+    "()",
+    "n/a",
+    "none",
+}
+
+

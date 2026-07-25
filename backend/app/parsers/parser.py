@@ -4,6 +4,8 @@ from app.parsers.pdf_parser import extract_text_from_pdf
 from app.parsers.docx_parser import extract_text_from_docx
 from app.parsers.preprocessing import preprocess_text
 from app.schemas.parser import ParsedResume
+from app.parsers.extractor import extract_skills
+from app.parsers.utils import clean_section_lines
 
 from app.parsers.extractor import (
     extract_name,
@@ -34,16 +36,29 @@ def parse_resume(file_path: str) -> dict:
     sections = extract_sections(clean_text)
     
     return ParsedResume(
+        
         name= extract_name(clean_text),
+        
         email= extract_email(clean_text),
+        
         phone= extract_phone(clean_text),
+        
         linkedin= extract_linkedin(clean_text),
+        
         github= extract_github(clean_text),
-        skills= sections["skills"],
-        education= sections["education"],
-        summary= sections["summary"],
-        experience= sections["experience"],
-        projects= sections["projects"],
-        certifications= sections["certifications"],
+        
+        skills= extract_skills(sections["skills"]),
+        
+        education= clean_section_lines(sections["education"]),
+        
+        summary= (sections["summary"]),
+        
+        experience= clean_section_lines(sections["experience"]),
+        
+        projects= clean_section_lines(sections["projects"]),
+        
+        certifications= clean_section_lines(sections["certifications"]),
+        
         raw_text= clean_text,
+        
     )

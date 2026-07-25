@@ -1,6 +1,18 @@
 import re
 from app.parsers.constants import SECTION_HEADINGS
 from app.parsers.utils import normalize_heading
+from app.parsers.constants import SKILL_CATEGORY_PREFIXES
+from app.parsers.constants import (
+    BULLET_PREFIXES,
+    SKILL_CATEGORY_PREFIXES,
+    SKILL_DELIMITERS,
+    IGNORED_SKILL_VALUES,
+)
+from app.parsers.utils import (
+    merge_wrapped_lines,
+    clean_skill,
+    normalize_heading,
+)
 
 
 def extract_email(text: str) -> str | None:
@@ -70,7 +82,7 @@ def extract_sections(text: str) -> dict:
         "experience": [],
         "projects": [],
         "certifications": [],
-        "summary": []
+        "summary": ""
     }
 
     current_section = None
@@ -103,7 +115,10 @@ def extract_sections(text: str) -> dict:
 
         if current_section:
 
-            sections[current_section].append(line)
+            if current_section == "summary":
+                sections["summary"] += line + "\n"
+            else:
+                sections[current_section].append(line)
 
     return sections
 
@@ -143,3 +158,77 @@ def extract_name(text: str) -> str | None:
         return line
 
     return None
+
+
+def extract_skills(
+    skills_section: list[str],
+) -> list[str]:
+
+    skills = []
+
+    skills_section = merge_wrapped_lines(
+        skills_section
+    )
+
+    for line in skills_section:
+
+        line = line.strip()
+
+        # Remove bullet
+        for bullet in BULLET_PREFIXES:
+            if line.startswith(bullet):
+                line = line[len(bullet):].strip()
+                break
+
+        # Remove category prefix
+        if ":" in line:
+
+            prefix, remainder = line.split(
+                ":",
+                1,
+            )
+
+            if (
+                normalize_heading(prefix)
+                in SKILL_CATEGORY_PREFIXES
+            ):
+                line = remainder.strip()
+
+        # Normalize delimiters
+        for delimiter in SKILL_DELIMITERS:
+            line = line.replace(
+                delimiter,
+                ",",
+            )
+
+        # Split into individual skills
+        parts = line.split(",")
+
+        for part in parts:
+
+            skill = clean_skill(part)
+
+            if (
+                normalize_heading(skill)
+                in IGNORED_SKILL_VALUES
+            ):
+                continue
+
+            if skill:
+                skills.append(skill)
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_skills = []
+
+    for skill in skills:
+
+        normalized = normalize_heading(skill)
+
+        if normalized not in seen:
+
+            seen.add(normalized)
+            unique_skills.append(skill)
+
+    return unique_skills
+
