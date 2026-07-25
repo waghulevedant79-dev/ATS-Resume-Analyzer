@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     MAX_LENGTH_SCORE,
     MIN_RECOMMENDED_WORDS,
     MAX_RECOMMENDED_WORDS,

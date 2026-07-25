@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     MAX_PROJECTS_SCORE,
     PROJECT_THRESHOLDS,
 )

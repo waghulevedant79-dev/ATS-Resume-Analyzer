@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     SUMMARY_SCORE,
     EDUCATION_SECTION_SCORE,
     EXPERIENCE_SECTION_SCORE,

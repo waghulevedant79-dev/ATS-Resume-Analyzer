@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     ACTION_VERBS,
     MAX_ACTION_VERB_SCORE,
 )

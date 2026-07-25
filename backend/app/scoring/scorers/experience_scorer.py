@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     MAX_EXPERIENCE_SCORE,
     EXPERIENCE_THRESHOLDS,
 )

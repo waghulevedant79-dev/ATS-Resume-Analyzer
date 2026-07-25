@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     EDUCATION_SCORE,
     MAX_EDUCATION_SCORE,
 )

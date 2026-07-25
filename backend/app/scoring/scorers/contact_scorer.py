@@ -1,4 +1,4 @@
-from backend.app.scoring.scorers.constants import (
+from app.scoring.scorers.constants import (
     EMAIL_SCORE,
     PHONE_SCORE,
     GITHUB_SCORE,
