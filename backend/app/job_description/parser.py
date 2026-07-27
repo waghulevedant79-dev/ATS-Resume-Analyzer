@@ -16,6 +16,7 @@ def parse_job_description(job_description: str) -> ParsedJobDescription:
     Parse a raw job description into structured data.
     """
     
+
     sections = extract_sections(job_description)
 
     parsed_jd = ParsedJobDescription(
@@ -47,5 +48,7 @@ def parse_job_description(job_description: str) -> ParsedJobDescription:
         ),
         
     )
+    
+    print(parsed_jd.model_dump())
 
     return parsed_jd

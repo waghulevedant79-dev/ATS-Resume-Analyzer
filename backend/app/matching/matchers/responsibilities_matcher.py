@@ -4,6 +4,7 @@ from app.matching.utils import tokenize_text
 from app.schemas.matching import (
     ResponsibilitiesMatchResult,
 )
+from app.matching.constants import RESPONSIBILITY_MATCH_THRESHOLD
 
 
 def match_responsibilities(
@@ -25,12 +26,16 @@ def match_responsibilities(
 
         jd_words = tokenize_text(line)
 
-        common_words = (
-            resume_words & jd_words
+        common_words = resume_words & jd_words
+
+        if not jd_words:
+            continue
+
+        overlap = (
+            len(common_words) / len(jd_words)
         )
 
-        if common_words:
-
+        if overlap >= RESPONSIBILITY_MATCH_THRESHOLD:
             matched += 1
     
     total = len(
@@ -44,6 +49,7 @@ def match_responsibilities(
             matched / total
         ) * 100
         
+
     
     return ResponsibilitiesMatchResult(
 

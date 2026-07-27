@@ -13,6 +13,8 @@ from app.parsers.utils import (
     clean_skill,
     normalize_heading,
 )
+from pprint import pprint
+
 
 
 def extract_email(text: str) -> str | None:
@@ -119,7 +121,9 @@ def extract_sections(text: str) -> dict:
                 sections["summary"] += line + "\n"
             else:
                 sections[current_section].append(line)
-
+    # print("\n========== EXTRACTED SECTIONS ==========")
+    # pprint(sections)
+    # print("=======================================\n")
     return sections
 
 

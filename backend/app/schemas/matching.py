@@ -41,11 +41,20 @@ class ResponsibilitiesMatchResult(BaseModel):
     match_percentage: float = 0.0
 
 
+class ConfidenceResult(BaseModel):
+
+    level: str = "Low"
+
+    score: float = 0.0
+
+
 class MatchResult(BaseModel):
 
     overall_match: float = 0.0
     
     skills: SkillMatchResult
+    
+    confidence: ConfidenceResult
     
     education: EducationMatchResult
 

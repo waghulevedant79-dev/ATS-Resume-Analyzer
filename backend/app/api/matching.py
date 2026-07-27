@@ -44,6 +44,7 @@ async def match_resume(
     return MatchResult(
         overall_match=result.overall_match,
         skills=result.skills,
+        confidence=result.confidence,
         experience=result.experience,
         education=result.education,
         responsibilities=result.responsibilities

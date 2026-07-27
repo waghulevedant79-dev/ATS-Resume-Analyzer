@@ -87,11 +87,13 @@ def normalize_text(text: str) -> str:
 
 def clean_section_lines(
     lines: list[str],
+    merge_wrapped: bool = True,
 ) -> list[str]:
 
     cleaned_lines = []
 
-    lines = merge_wrapped_lines(lines)
+    if merge_wrapped:
+        lines = merge_wrapped_lines(lines)
 
     for line in lines:
 

@@ -1,6 +1,6 @@
 from app.schemas.resume import ParsedResume
 from app.schemas.job_description import ParsedJobDescription
-from app.matching.utils import extract_years
+from app.matching.utils import extract_years, extract_total_experience
 from app.schemas.matching import ExperienceMatchResult
 
 
@@ -20,15 +20,9 @@ def match_experience(
             break
 
 
-    candidate = 0.0
-
-    for line in resume.experience:
-
-        years = extract_years(line)
-
-        if years is not None:
-            candidate = years
-            break
+    candidate = extract_total_experience(
+        resume.experience
+    )
 
     matched = candidate >= required
     

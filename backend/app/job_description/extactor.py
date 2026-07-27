@@ -1,6 +1,7 @@
 import re
-from app.job_description.constants import SECTION_HEADINGS
-from app.job_description.utils import normalize_heading
+from app.job_description.utils import normalize_heading, SECTION_HEADINGS
+from pprint import pprint
+
 
 
 def extract_job_title(text: str):
@@ -53,19 +54,19 @@ def extract_sections(text: str) -> dict[str, list[str]]:
         normalized = normalize_heading(line)
 
         heading_found = False
-
+        
         for section_name, headings in SECTION_HEADINGS.items():
 
             if normalized in headings:
-
+                
                 current_section = section_name
                 heading_found = True
                 break
 
         if not heading_found and current_section:
-
+    
             sections[current_section].append(line)
-
+            
     return sections
 
 

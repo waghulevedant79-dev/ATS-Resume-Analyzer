@@ -1,4 +1,4 @@
-SECTION_HEADINGS = {
+RAW_SECTION_HEADINGS = {
     
     "required_skills": {
         "required skills",
@@ -30,20 +30,30 @@ SECTION_HEADINGS = {
 
     "responsibilities": {
         "responsibilities",
+        "key responsibilities",
         "job responsibilities",
-        "roles and responsibilities",
-        "duties",
+        "primary responsibilities",
+        "role responsibilities",
+        "your responsibilities",
         "what you'll do",
+        "what you will do",
+        "duties",
+        "key duties",
     },
 
     "tools": {
         "tools",
+        "tools & technologies",
+        "tools and technologies",
         "technologies",
+        "technology stack",
         "tech stack",
         "software",
-    },
+        "software tools",
+    }, 
     
 }
+
 
 SKILLS_WEIGHT = 0.50
 EXPERIENCE_WEIGHT = 0.20

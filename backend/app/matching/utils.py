@@ -3,21 +3,30 @@ from app.schemas.matching import (
     SkillMatchResult,
     ExperienceMatchResult,
     EducationMatchResult,
-    ResponsibilitiesMatchResult
+    ResponsibilitiesMatchResult,
+    ConfidenceResult
 )
 from app.job_description.constants import (
     SKILLS_WEIGHT,
     EDUCATION_WEIGHT,
     EXPERIENCE_WEIGHT,
-    RESPONSIBILITIES_WEIGHT
+    RESPONSIBILITIES_WEIGHT,
 )
-from app.matching.constants import DEGREE_LEVELS
+from app.matching.constants import DEGREE_LEVELS, MONTHS, STOP_WORDS
+from datetime import datetime
 
 
 """Normalize text before comparison."""
+import re
+
 def normalize_text(text: str) -> str:
 
-    return text.strip().lower()
+    text = text.lower().strip()
+
+    # Remove leading bullets
+    text = re.sub(r"^[-•*]+\s*", "", text)
+
+    return text
 
 
 """Extract experience duration from text and return it in years."""
@@ -25,7 +34,7 @@ def extract_years(text: str) -> float | None:
 
     normalized = text.lower()
 
-    # Years
+    # Explicit years
     year_match = re.search(
         r"(\d+(?:\.\d+)?)\+?\s*(?:year|years|yr|yrs)",
         normalized,
@@ -34,7 +43,7 @@ def extract_years(text: str) -> float | None:
     if year_match:
         return float(year_match.group(1))
 
-    # Months
+    # Explicit months
     month_match = re.search(
         r"(\d+(?:\.\d+)?)\+?\s*(?:month|months|mo|mos)",
         normalized,
@@ -43,7 +52,38 @@ def extract_years(text: str) -> float | None:
     if month_match:
         return float(month_match.group(1)) / 12
 
-    return None
+    # Date range (e.g. Feb 2024 – Present)
+    date_match = re.search(
+        r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)"
+        r"\s+(\d{4})\s*[–-]\s*"
+        r"(present|current|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)"
+        r"(?:\s+(\d{4}))?",
+        normalized,
+    )
+
+    if not date_match:
+        return None
+
+    start_month = MONTHS[date_match.group(1)]
+    start_year = int(date_match.group(2))
+
+    end_token = date_match.group(3)
+
+    if end_token in ("present", "current"):
+        today = datetime.today()
+        end_month = today.month
+        end_year = today.year
+    else:
+        end_month = MONTHS[end_token]
+        end_year = int(date_match.group(4))
+
+    total_months = (
+        (end_year - start_year) * 12
+        + (end_month - start_month)
+    )
+
+    return round(total_months / 12, 1)
+
 
 """Extract degree in numbers from text."""
 def extract_degree_level(text: str) -> int:
@@ -67,7 +107,11 @@ def tokenize_text(text: str) -> set[str]:
 
     words = re.findall(r"\b[a-z0-9]+\b", normalized)
 
-    return set(words)
+    return {
+    word
+    for word in words
+    if word not in STOP_WORDS
+}
 
 
 """Calculate the final weighted resume-job match score."""
@@ -98,5 +142,65 @@ def calculate_overall_score(
     )
 
     return round(overall_score, 2)
+
+
+"""Calculate total years of experience from all experience lines."""
+def extract_total_experience(
+    experience_lines: list[str],
+) -> float:
+
+    total_years = 0.0
+
+    for line in experience_lines:
+
+        years = extract_years(line)
+
+        if years is not None:
+            total_years += years
+
+    return round(total_years, 1)
+
+
+"""Calculate the confidance of resume-job match score."""
+def calculate_confidence(
+    skills: SkillMatchResult,
+    experience: ExperienceMatchResult,
+    education: EducationMatchResult,
+    responsibilities: ResponsibilitiesMatchResult,
+) -> ConfidenceResult:
+    
+    experience_score = (
+        100.0 if experience.matched else 0.0
+    )
+
+    education_score = (
+        100.0 if education.matched else 0.0
+    )
+    
+    scores = [
+        skills.match_percentage,
+        experience_score,
+        education_score,
+        responsibilities.match_percentage,
+    ]
+
+    confidence_score = (
+        sum(scores) / len(scores)
+    )
+    
+    if confidence_score >= 80:
+        level = "High"
+
+    elif confidence_score >= 60:
+        level = "Medium"
+
+    else:
+        level = "Low"
+        
+    
+    return ConfidenceResult(
+        level=level,
+        score=round(confidence_score, 2),
+        )
 
 

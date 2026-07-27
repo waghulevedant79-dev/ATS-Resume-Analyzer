@@ -53,7 +53,10 @@ def parse_resume(file_path: str) -> dict:
         
         summary= (sections["summary"]),
         
-        experience= clean_section_lines(sections["experience"]),
+        experience = clean_section_lines(
+                    sections["experience"],
+                    merge_wrapped=False,
+                ),
         
         projects= clean_section_lines(sections["projects"]),
         

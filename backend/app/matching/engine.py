@@ -5,7 +5,7 @@ from app.matching.matchers.skills_matcher import match_skills
 from app.matching.matchers.experience_matcher import match_experience
 from app.matching.matchers.eduaction_matcher import match_education
 from app.matching.matchers.responsibilities_matcher import match_responsibilities
-from app.matching.utils import calculate_overall_score
+from app.matching.utils import calculate_overall_score, calculate_confidence
 
 
 
@@ -43,11 +43,21 @@ def match_resume_to_job_description(
         responsibilities=responsibilities_result,
     )
     
+    confidence = calculate_confidence(
+        skills_result,
+        experience_result,
+        education_result,
+        responsibilities_result,
+    )
+    
+    
     return MatchResult(
         
         overall_match=overall_score,
         
         skills=skills_result,
+        
+        confidence=confidence,
         
         experience=experience_result,
         
