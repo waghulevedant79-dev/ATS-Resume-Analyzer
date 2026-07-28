@@ -21,6 +21,8 @@ class ParsedResume(BaseModel):
     education: list[str] = Field(default_factory=list)
 
     experience: list[str] = Field(default_factory=list)
+    
+    responsibilities: list[str] = Field(default_factory=list)
 
     projects: list[str] = Field(default_factory=list)
 

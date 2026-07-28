@@ -13,7 +13,6 @@ from app.parsers.utils import (
     clean_skill,
     normalize_heading,
 )
-from pprint import pprint
 
 
 
@@ -236,3 +235,104 @@ def extract_skills(
 
     return unique_skills
 
+
+def extract_responsibilities(
+    responsibilities_section: list[str],
+) -> list[str]:
+
+    responsibilities = []
+
+    date_pattern = re.compile(
+        r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
+        r".*?\d{4}"
+    )
+
+    for line in responsibilities_section:
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        # Skip dates
+        if date_pattern.search(line):
+            continue
+
+        # Remove bullet
+        for bullet in BULLET_PREFIXES:
+
+            if line.startswith(bullet):
+
+                line = line[len(bullet):].strip()
+
+                break
+
+        # Keep only responsibility-like lines
+        if line.startswith("-"):
+
+            line = line[1:].strip()
+
+        if len(line.split()) < 5:
+            continue
+
+        responsibilities.append(line)
+
+    return responsibilities
+
+
+def extract_projects(
+    project_section: list[str],
+) -> list[str]:
+
+    projects = []
+
+    for line in project_section:
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        # Keep only bullet point lines
+        if not line.startswith(BULLET_PREFIXES):
+            continue
+
+        # Remove bullet character
+        line = line.lstrip("•-– ").strip()
+
+        if line:
+            projects.append(line)
+
+    return projects
+
+
+def extract_experience(
+    experience_section: list[str],
+) -> list[str]:
+
+    experience = []
+
+    for line in experience_section:
+
+        line = line.strip()
+
+        if not line:
+            continue
+
+        # Remove bullet prefixes
+        for bullet in BULLET_PREFIXES:
+
+            if line.startswith(bullet):
+
+                line = line[len(bullet):].strip()
+
+                break
+
+        # Remove leading dash if present
+        if line.startswith("-"):
+
+            line = line[1:].strip()
+
+        experience.append(line)
+
+    return experience

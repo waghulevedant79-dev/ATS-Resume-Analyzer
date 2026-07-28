@@ -79,3 +79,87 @@ MATCH_WEIGHTS = {
 }
 
 
+RELATED_BRANCHES = {
+    "computer engineering": {
+        "computer engineering",
+        "computer science",
+        "information technology",
+        "software engineering",
+        "artificial intelligence",
+        "artificial intelligence and data science",
+        "data science",
+    },
+
+    "computer science": {
+        "computer engineering",
+        "computer science",
+        "information technology",
+        "software engineering",
+        "artificial intelligence",
+        "artificial intelligence and data science",
+        "data science",
+    },
+
+    "information technology": {
+        "computer engineering",
+        "computer science",
+        "information technology",
+        "software engineering",
+        "artificial intelligence",
+        "artificial intelligence and data science",
+        "data science",
+    },
+}
+
+
+BRANCH_ALIASES = {
+    "computer engineering": [
+        "computer engineering",
+        "computer engg",
+        "computer engineer",
+    ],
+
+    "computer science": [
+        "computer science",
+        "computer science engineering",
+        "cse",
+    ],
+
+    "information technology": [
+        "information technology",
+        "it",
+    ],
+
+    "software engineering": [
+        "software engineering",
+    ],
+
+    "artificial intelligence": [
+        "artificial intelligence",
+        "ai",
+    ],
+
+    "artificial intelligence and data science": [
+        "artificial intelligence and data science",
+        "ai & ds",
+        "ai and ds",
+        "aids",
+    ],
+
+    "data science": [
+        "data science",
+        "ds",
+    ],
+
+    "mechanical engineering": [
+        "mechanical engineering",
+        "mechanical",
+    ],
+
+    "electronics and communication": [
+        "electronics and communication",
+        "electronics",
+        "ece",
+    ],
+}
+

@@ -12,7 +12,7 @@ from app.job_description.constants import (
     EXPERIENCE_WEIGHT,
     RESPONSIBILITIES_WEIGHT,
 )
-from app.matching.constants import DEGREE_LEVELS, MONTHS, STOP_WORDS
+from app.matching.constants import DEGREE_LEVELS, MONTHS, STOP_WORDS, BRANCH_ALIASES
 from datetime import datetime
 
 
@@ -202,5 +202,20 @@ def calculate_confidence(
         level=level,
         score=round(confidence_score, 2),
         )
+
+
+"""Calculate branch matching."""
+def extract_branch(text: str) -> str:
+
+    normalized = normalize_text(text)
+
+    for branch, aliases in BRANCH_ALIASES.items():
+
+        for alias in aliases:
+
+            if alias in normalized:
+                return branch
+
+    return ""
 
 
