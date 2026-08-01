@@ -13,7 +13,7 @@ from app.parsers.utils import (
     clean_skill,
     normalize_heading,
 )
-
+from app.schemas.parser import ParsedProject
 
 
 def extract_email(text: str) -> str | None:
@@ -304,6 +304,83 @@ def extract_projects(
             projects.append(line)
 
     return projects
+
+
+def extract_project_details(
+    project_section: list[str],
+) -> list[ParsedProject]:
+
+    project_details = []
+
+    current_title = None
+    current_descriptions = []
+
+    for raw_line in project_section:
+
+        line = raw_line.strip()
+
+        if not line:
+            continue
+
+        # -----------------------------
+        # Bullet line
+        # -----------------------------
+        if line.startswith(BULLET_PREFIXES):
+
+            description = line.lstrip(
+                "•-– "
+            ).strip()
+
+            if description:
+                current_descriptions.append(
+                    description
+                )
+
+            continue
+
+        # -----------------------------
+        # Wrapped bullet continuation
+        # -----------------------------
+        if (
+            current_descriptions
+            and not current_descriptions[-1].endswith(
+                (".", "!", "?")
+            )
+        ):
+            current_descriptions[-1] += (
+                " " + line
+            )
+
+            continue
+
+        # -----------------------------
+        # Otherwise this is a new title
+        # -----------------------------
+        if current_title is not None:
+
+            project_details.append(
+                ParsedProject(
+                    title=current_title,
+                    descriptions=current_descriptions,
+                )
+            )
+
+        current_title = line
+        current_descriptions = []
+
+    # -----------------------------
+    # Save final project
+    # -----------------------------
+    if current_title is not None:
+
+        project_details.append(
+            ParsedProject(
+                title=current_title,
+                descriptions=current_descriptions,
+            )
+        )
+
+    return project_details
 
 
 def extract_experience(

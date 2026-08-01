@@ -30,22 +30,26 @@ def match_responsibilities(
     }
     
     """Exact matches"""
-    matched_responsibilities = (
+    
+    exact_matches = (
         resume_responsibilities &
         jd_responsibilities
     )
 
+    matched_items = list(exact_matches)
+
     remaining_resume = (
         resume_responsibilities -
-        matched_responsibilities
+        exact_matches
     )
 
     remaining_jd = (
         jd_responsibilities -
-        matched_responsibilities
+        exact_matches
     )
     
     """Batch encode once"""
+    
     resume_embeddings = dict(
         zip(
             remaining_resume,
@@ -64,7 +68,7 @@ def match_responsibilities(
         )
     )
     
-    semantic_matches = 0
+    """Semantic Matching"""
 
     for jd_line in list(remaining_jd):
 
@@ -87,28 +91,31 @@ def match_responsibilities(
                 >= RESPONSIBILITY_SIMILARITY_THRESHOLD
             ):
 
-                semantic_matches += 1
+                matched_items.append(jd_line)
 
                 remaining_resume.remove(
                     resume_line
                 )
+                
+                remaining_jd.remove(
+                    jd_line
+                )
 
                 break
     
-    matched = (
-        len(matched_responsibilities)
-        + semantic_matches
-    )
+    matched = len(matched_items)
 
     total = len(jd_responsibilities)
 
-    if total == 0:
-        percentage = 0.0
-    else:
-        percentage = (
-            matched / total
-        ) * 100
+    percentage = (
+        (matched / total) * 100
+        if total > 0
+        else 0.0
+    )
 
+    # Remaining JD responsibilities
+    # are the missing ones.
+    missing_items = list(remaining_jd)
     
     return ResponsibilitiesMatchResult(
 
@@ -120,4 +127,8 @@ def match_responsibilities(
         percentage,
         2,
     ),
+    
+    matched_items=matched_items,
+    
+    missing_items=missing_items
 )

@@ -40,6 +40,10 @@ class ResponsibilitiesMatchResult(BaseModel):
 
     match_percentage: float = 0.0
 
+    matched_items: list[str] = Field(default_factory=list)
+
+    missing_items: list[str] = Field(default_factory=list)
+
 
 class ConfidenceResult(BaseModel):
 

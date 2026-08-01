@@ -16,6 +16,7 @@ from app.parsers.extractor import (
     extract_skills,
     extract_experience,
     extract_projects,
+    extract_project_details,
     extract_responsibilities
 )
 
@@ -63,6 +64,8 @@ def parse_resume(file_path: str) -> dict:
         responsibilities=extract_responsibilities(sections["experience"]),
         
         projects= extract_projects(sections["projects"]),
+        
+        project_details=extract_project_details(sections["projects"]),
         
         certifications= clean_section_lines(sections["certifications"]),
         

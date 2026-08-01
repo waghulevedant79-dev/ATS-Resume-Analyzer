@@ -3,6 +3,14 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+class ParsedProject(BaseModel):
+    title: Optional[str] = None
+
+    descriptions: list[str] = Field(
+        default_factory=list
+    )
+
+
 class ParsedResume(BaseModel):
     name: Optional[str] = None
 
@@ -25,6 +33,9 @@ class ParsedResume(BaseModel):
     responsibilities: list[str] = Field(default_factory=list)
 
     projects: list[str] = Field(default_factory=list)
+
+    project_details: list[ParsedProject] = Field(
+        default_factory=list)
 
     skills: list[str] = Field(default_factory=list)
 

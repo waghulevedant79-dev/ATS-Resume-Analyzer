@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.core.settings import settings
 from app.api.resume import router as resume_router
 from app.api.matching import router as match_router
+from app.api.ai import router as ai_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -17,3 +18,4 @@ def home():
 
 app.include_router(resume_router)
 app.include_router(match_router)
+app.include_router(ai_router)

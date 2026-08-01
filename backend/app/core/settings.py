@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     
     UPLOAD_DIR: str
     
+    GEMINI_API_KEY: str
+    
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    
     class Config:
         env_file = ".env"
     
