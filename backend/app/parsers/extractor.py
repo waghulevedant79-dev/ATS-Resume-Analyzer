@@ -46,22 +46,36 @@ def extract_phone(text: str) -> str | None:
     return None
 
 
-def extract_linkedin(text: str) -> str | None:
+def extract_linkedin(
+    text: str,
+    hyperlinks: list[str] | None = None,
+) -> str | None:
     """
     Extract LinkedIn profile URL.
     """
 
-    pattern = r"https?://(?:[a-z]{2,3}\.)?(?:www\.)?linkedin\.com/in/[^\s]+"
+    pattern = (
+        r"https?://(?:[a-z]{2,3}\.)?"
+        r"(?:www\.)?linkedin\.com/in/[^\s]+"
+    )
 
     match = re.search(pattern, text)
 
     if match:
         return match.group()
 
+    if hyperlinks:
+        for link in hyperlinks:
+            if "linkedin.com/in/" in link.lower():
+                return link
+
     return None
 
 
-def extract_github(text: str) -> str | None:
+def extract_github(
+    text: str,
+    hyperlinks: list[str] | None = None,
+) -> str | None:
     """
     Extract GitHub profile URL.
     """
@@ -72,6 +86,48 @@ def extract_github(text: str) -> str | None:
 
     if match:
         return match.group()
+
+    if hyperlinks:
+        for link in hyperlinks:
+            if "github.com/" in link.lower():
+                return link
+
+    return None
+
+
+def extract_portfolio(
+    text: str,
+    hyperlinks: list[str] | None = None,
+) -> str | None:
+    """
+    Extract portfolio or personal website URL.
+    """
+
+    # Optional: Detect visible URLs first (if you want)
+    pattern = r"https?://[^\s]+"
+
+    matches = re.findall(pattern, text)
+
+    ignored_domains = (
+        "linkedin.com",
+        "github.com",
+        "leetcode.com",
+        "hackerrank.com",
+        "codechef.com",
+        "codeforces.com",
+        "geeksforgeeks.org",
+    )
+
+    # First check visible URLs
+    for url in matches:
+        if not any(domain in url.lower() for domain in ignored_domains):
+            return url
+
+    # Then check embedded hyperlinks
+    if hyperlinks:
+        for url in hyperlinks:
+            if not any(domain in url.lower() for domain in ignored_domains):
+                return url
 
     return None
 

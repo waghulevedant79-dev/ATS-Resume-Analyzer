@@ -12,6 +12,7 @@ from app.parsers.extractor import (
     extract_email,
     extract_github,
     extract_linkedin,
+    extract_portfolio,
     extract_sections,
     extract_skills,
     extract_experience,
@@ -19,6 +20,7 @@ from app.parsers.extractor import (
     extract_project_details,
     extract_responsibilities
 )
+from app.parsers.hyperlink_extractor import extract_hyperlinks
 
 
 def parse_resume(file_path: str) -> dict:
@@ -28,9 +30,11 @@ def parse_resume(file_path: str) -> dict:
     
     if extension == ".pdf":
         raw_text = extract_text_from_pdf(file_path)
-    
+        hyperlinks = extract_hyperlinks(file_path)
+
     elif extension == ".docx":
         raw_text = extract_text_from_docx(file_path)
+        hyperlinks = []
     
     else:
         raise ValueError("Unsupported file format.")
@@ -49,9 +53,11 @@ def parse_resume(file_path: str) -> dict:
         
         phone= extract_phone(clean_text),
         
-        linkedin= extract_linkedin(clean_text),
+        linkedin= extract_linkedin(clean_text, hyperlinks),
         
-        github= extract_github(clean_text),
+        github= extract_github(clean_text, hyperlinks),
+        
+        portfolio=extract_portfolio(clean_text, hyperlinks),
         
         skills= extract_skills(sections["skills"]),
         
