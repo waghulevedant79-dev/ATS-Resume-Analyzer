@@ -9,6 +9,7 @@ import os
 
 from app.parsers.parser import parse_resume
 from app.scoring.scorer import calculate_ats_score
+from app.services.parsed_resume_service import save_parsed_resume
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +78,13 @@ def process_uploaded_resume(
 
         # Parse resume
         parsed_resume = parse_resume(resume.file_path)
+        
+        # save parsed resume in database 
+        save_parsed_resume(
+            db,
+            resume,
+            parsed_resume
+        )
         
         # calculating ats score
         ats_score = calculate_ats_score(parsed_resume)

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
-
+from sqlalchemy.orm import relationship
 from app.db.database import Base
 
 class Resume(Base):
@@ -19,4 +19,11 @@ class Resume(Base):
     updated_at = Column(
         DateTime(timezone=True),
         server_default=func.now()
+    )
+    
+    parsed_resume = relationship(
+        "ResumeParsedData",
+        back_populates="resume",
+        uselist=False,
+        cascade="all, delete-orphan",
     )

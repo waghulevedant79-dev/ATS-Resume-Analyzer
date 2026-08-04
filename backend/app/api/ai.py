@@ -1,21 +1,16 @@
 from fastapi import (
     APIRouter,
     Depends,
-    File,
-    Form,
     HTTPException,
-    UploadFile,
 )
 from sqlalchemy.orm import Session
 
 from app.ai.service import AIService
 from app.integrations.gemini import GeminiProvider
 
-
-from app.services.resume_service import process_uploaded_resume
 from app.job_description.parser import parse_job_description
 from app.matching.engine import match_resume_to_job_description
-
+from app.scoring.scorer import calculate_ats_score
 
 from app.db.dependencies import get_db 
 from app.schemas.ai import ( 
@@ -25,8 +20,9 @@ from app.schemas.ai import (
     KeywordExplanationResponse, 
     RewrittenResumeResponse 
 )
-
-
+from app.schemas.ai_request import ResumeAIRequest, ProjectEnhancementRequest
+from app.schemas.matching_request import ResumeJobDescriptionRequest
+from app.services.parsed_resume_service import get_parsed_resume_schema
 
 
 ai_service = AIService(GeminiProvider())
@@ -43,34 +39,29 @@ router = APIRouter(
     status_code=200,
 )
 async def analyze_resume(
-    resume: UploadFile = File(...),
-    job_description: UploadFile = File(...),
+    request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
 ):
     
     # --------------------------------
-    # 1. Process Resume
+    # 1. Retrieve Parsed Resume
     # --------------------------------
 
-    processed = process_uploaded_resume(
-        db,
-        resume,
+    parsed_resume = get_parsed_resume_schema(
+        db=db,
+        resume_id=request.resume_id,
     )
 
-    parsed_resume = processed["parsed_resume"]
-
-    ats_result = processed["ats_score"]
+    ats_result = calculate_ats_score(parsed_resume)
 
     # --------------------------------
     # 2. Parse Job Description
     # --------------------------------
-    
-    contents = await job_description.read()
-
-    text = contents.decode("utf-8")
 
     parsed_job_description = (
-        parse_job_description(text)
+        parse_job_description(
+            request.job_description
+        )
     )
 
     # --------------------------------
@@ -103,24 +94,21 @@ async def analyze_resume(
     status_code=200,
 )
 def generate_professional_summary(
-    resume: UploadFile = File(...),
+    request: ResumeAIRequest,
     db: Session = Depends(get_db),
 ):
 
-    processed = process_uploaded_resume(
-        db,
-        resume,
+
+    parsed_resume = get_parsed_resume_schema(
+        db=db,
+        resume_id=request.resume_id
     )
 
-    parsed_resume = processed[
-        "parsed_resume"
-    ]
-
-    result = ai_service.generate_professional_summary(
+    return ai_service.generate_professional_summary(
         resume=parsed_resume
     )
+    
 
-    return result
 
 @router.post(
     "/enhance-project",
@@ -128,19 +116,14 @@ def generate_professional_summary(
     status_code=200,
 )
 def enhance_project(
-    project_index: int = Form(...),
-    resume: UploadFile = File(...),
+    request: ProjectEnhancementRequest,
     db: Session = Depends(get_db),
 ):
 
-    processed = process_uploaded_resume(
-        db,
-        resume,
-    )
-
-    parsed_resume = processed[
-        "parsed_resume"
-    ]
+    parsed_resume = get_parsed_resume_schema(
+    db=db,
+    resume_id=request.resume_id,
+)
 
     # Check structured projects
     if not parsed_resume.project_details:
@@ -151,8 +134,8 @@ def enhance_project(
 
     # Validate selected project index
     if (
-        project_index < 0
-        or project_index >= len(parsed_resume.project_details)
+        request.project_index < 0
+        or request.project_index >= len(parsed_resume.project_details)
     ):
         raise HTTPException(
             status_code=400,
@@ -161,7 +144,7 @@ def enhance_project(
 
     # Get complete project
     selected_project = parsed_resume.project_details[
-        project_index
+        request.project_index
     ]
 
     result = ai_service.enhance_project(
@@ -178,36 +161,26 @@ def enhance_project(
     status_code=200,
 )
 async def explain_missing_keywords(
-    resume: UploadFile = File(...),
-    job_description: UploadFile = File(...),
+    request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
 ):
 
-    # 1. Process uploaded resume
-    processed = process_uploaded_resume(
-        db,
-        resume,
+    # 1. Retrieve Parsed Resume
+
+    parsed_resume = get_parsed_resume_schema(
+        db=db,
+        resume_id=request.resume_id
     )
 
-    parsed_resume = processed[
-        "parsed_resume"
-    ]
 
-    # 2. Read uploaded Job Description
-    contents = await job_description.read()
-
-    text = contents.decode(
-        "utf-8"
-    )
-
-    # 3. Parse Job Description
+    # 2. Parse Job Description
     parsed_job_description = (
         parse_job_description(
-            text
+            request.job_description
         )
     )
 
-    # 4. Run existing Match Engine
+    # 3. Run existing Match Engine
     match_result = (
         match_resume_to_job_description(
             resume=parsed_resume,
@@ -215,7 +188,7 @@ async def explain_missing_keywords(
         )
     )
 
-    # 5. AI explains the deterministic
+    # 4. AI explains the deterministic
     # missing skills
     result = (
         ai_service.explain_missing_keywords(
@@ -233,18 +206,14 @@ async def explain_missing_keywords(
     status_code=200,
 )
 def rewrite_resume(
-    resume: UploadFile = File(...),
+    request: ResumeAIRequest,
     db: Session = Depends(get_db),
 ):
 
-    processed = process_uploaded_resume(
-        db,
-        resume,
-    )
-
-    parsed_resume = processed[
-        "parsed_resume"
-    ]
+    parsed_resume = get_parsed_resume_schema(
+    db=db,
+    resume_id=request.resume_id,
+)
 
     result = ai_service.rewrite_resume(
         resume=parsed_resume,
