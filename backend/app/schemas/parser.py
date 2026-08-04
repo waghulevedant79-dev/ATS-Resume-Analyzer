@@ -1,9 +1,12 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class ParsedProject(BaseModel):
+    
+    model_config = ConfigDict(from_attributes=True)
+    
     title: Optional[str] = None
 
     descriptions: list[str] = Field(
@@ -12,6 +15,9 @@ class ParsedProject(BaseModel):
 
 
 class ParsedResume(BaseModel):
+    
+    model_config = ConfigDict(from_attributes=True)
+    
     name: Optional[str] = None
 
     email: Optional[str] = None
