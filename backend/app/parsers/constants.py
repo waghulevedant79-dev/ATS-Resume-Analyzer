@@ -157,29 +157,6 @@ SECTION_HEADINGS = {
 }
 
 
-SKILL_CATEGORY_PREFIXES = {
-    "front-end",
-    "frontend",
-    "back-end",
-    "backend",
-    "database",
-    "databases",
-    "tools",
-    "frameworks",
-    "framework",
-    "libraries",
-    "library",
-    "languages",
-    "language",
-    "cloud",
-    "devops",
-    "ai",
-    "machine learning",
-    "ai / machine learning",
-    "artificial intelligence",
-}
-
-
 BULLET_PREFIXES = (
     "•",
     "-",
@@ -232,4 +209,21 @@ IGNORED_SKILL_VALUES = {
     "none",
 }
 
+
+IGNORED_PORTFOLIO_DOMAINS = {
+    "linkedin.com",
+    "github.com",
+    "leetcode.com",
+    "hackerrank.com",
+    "codechef.com",
+    "codeforces.com",
+    "geeksforgeeks.org",
+    "stackoverflow.com",
+    "kaggle.com",
+    "medium.com",
+    "dev.to",
+}
+
+
+MIN_DESCRIPTION_WORDS = 5
 

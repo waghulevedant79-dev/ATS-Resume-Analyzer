@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from app.services.resume_service import process_uploaded_resume
 from app.job_description.parser import parse_job_description
@@ -20,7 +20,7 @@ router = APIRouter(
 )
 async def match_resume(
     resume: UploadFile = File(...),
-    job_description: UploadFile = File(...),
+    job_description: str = Form(...),
     db: Session = Depends(get_db)
 ):
     
@@ -29,11 +29,9 @@ async def match_resume(
     parsed_resume = processed["parsed_resume"]
     
     
-    contents = await job_description.read()
-    text = contents.decode("utf-8")
     
     parsed_job_description = parse_job_description(
-        text
+        job_description
         )
     
     result = match_resume_to_job_description(

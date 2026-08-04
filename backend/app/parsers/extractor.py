@@ -1,12 +1,13 @@
 import re
-from app.parsers.constants import SECTION_HEADINGS
 from app.parsers.utils import normalize_heading
-from app.parsers.constants import SKILL_CATEGORY_PREFIXES
 from app.parsers.constants import (
     BULLET_PREFIXES,
     SKILL_CATEGORY_PREFIXES,
     SKILL_DELIMITERS,
     IGNORED_SKILL_VALUES,
+    SECTION_HEADINGS,
+    IGNORED_PORTFOLIO_DOMAINS,
+    MIN_DESCRIPTION_WORDS
 )
 from app.parsers.utils import (
     merge_wrapped_lines,
@@ -103,31 +104,36 @@ def extract_portfolio(
     Extract portfolio or personal website URL.
     """
 
-    # Optional: Detect visible URLs first (if you want)
     pattern = r"https?://[^\s]+"
 
-    matches = re.findall(pattern, text)
+    visible_urls = re.findall(pattern, text)
 
-    ignored_domains = (
-        "linkedin.com",
-        "github.com",
-        "leetcode.com",
-        "hackerrank.com",
-        "codechef.com",
-        "codeforces.com",
-        "geeksforgeeks.org",
-    )
+    portfolio_candidates = visible_urls.copy()
 
-    # First check visible URLs
-    for url in matches:
-        if not any(domain in url.lower() for domain in ignored_domains):
-            return url
-
-    # Then check embedded hyperlinks
     if hyperlinks:
-        for url in hyperlinks:
-            if not any(domain in url.lower() for domain in ignored_domains):
-                return url
+        portfolio_candidates.extend(hyperlinks)
+
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_candidates = []
+
+    for url in portfolio_candidates:
+
+        normalized = url.lower()
+
+        if normalized not in seen:
+
+            seen.add(normalized)
+            unique_candidates.append(url)
+
+    # Return the first URL that is not a known profile website
+    for url in unique_candidates:
+
+        if not any(
+            domain in url.lower()
+            for domain in IGNORED_PORTFOLIO_DOMAINS
+        ):
+            return url
 
     return None
 
@@ -349,15 +355,17 @@ def extract_projects(
         if not line:
             continue
 
-        # Keep only bullet point lines
-        if not line.startswith(BULLET_PREFIXES):
+        # Remove bullet prefixes if present
+        for bullet in BULLET_PREFIXES:
+            if line.startswith(bullet):
+                line = line[len(bullet):].strip()
+                break
+
+        # Ignore likely project titles
+        if len(line.split()) < MIN_DESCRIPTION_WORDS:
             continue
 
-        # Remove bullet character
-        line = line.lstrip("•-– ").strip()
-
-        if line:
-            projects.append(line)
+        projects.append(line)
 
     return projects
 
