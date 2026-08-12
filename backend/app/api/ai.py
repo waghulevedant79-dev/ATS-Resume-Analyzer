@@ -170,15 +170,13 @@ def enhance_project(
 async def explain_missing_keywords(
     request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
 
     # 1. Retrieve Parsed Resume
 
-    parsed_resume = get_owned_parsed_resume_schema(
+    parsed_resume = get_parsed_resume_schema(
         db=db,
         resume_id=request.resume_id,
-        user=current_user,
     )
 
 

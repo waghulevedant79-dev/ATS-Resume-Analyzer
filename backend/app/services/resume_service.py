@@ -152,3 +152,61 @@ def get_owned_resume(
         )
 
     return resume
+
+
+def claim_anonymous_resume(
+    db: Session,
+    resume_id: int,
+    user: User,
+) -> Resume:
+    """
+    Claim an anonymous resume for the authenticated user.
+
+    A resume can only be claimed when it currently has no owner.
+    If it already belongs to the authenticated user, return it.
+    If it belongs to another user, reject the request.
+    """
+
+    resume = (
+        db.query(Resume)
+        .filter(Resume.id == resume_id)
+        .with_for_update()
+        .first()
+    )
+
+    if resume is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found.",
+        )
+
+    # Already owned by this user.
+    if resume.user_id == user.id:
+        return resume
+
+    # Anonymous resume → assign ownership.
+    if resume.user_id is None:
+        resume.user_id = user.id
+
+        try:
+            db.commit()
+            db.refresh(resume)
+        except SQLAlchemyError:
+            db.rollback()
+
+            logger.exception(
+                "Database error while claiming resume."
+            )
+
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to claim resume.",
+            )
+
+        return resume
+
+    # Resume belongs to another user.
+    raise HTTPException(
+        status_code=403,
+        detail="You do not have access to this resume.",
+    )
