@@ -22,7 +22,7 @@ from app.schemas.ai import (
 )
 from app.schemas.ai_request import ResumeAIRequest, ProjectEnhancementRequest
 from app.schemas.matching_request import ResumeJobDescriptionRequest
-from app.services.parsed_resume_service import get_owned_parsed_resume_schema
+from app.services.parsed_resume_service import get_owned_parsed_resume_schema, get_parsed_resume_schema
 from app.auth.dependencies import get_current_user
 from app.models.user import User
 
@@ -44,17 +44,15 @@ router = APIRouter(
 async def analyze_resume(
     request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     
     # --------------------------------
     # 1. Retrieve Parsed Resume
     # --------------------------------
 
-    parsed_resume = get_owned_parsed_resume_schema(
+    parsed_resume = get_parsed_resume_schema(
         db=db,
         resume_id=request.resume_id,
-        user=current_user,
     )
 
     ats_result = calculate_ats_score(parsed_resume)

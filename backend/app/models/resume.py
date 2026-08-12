@@ -27,7 +27,7 @@ class Resume(Base):
             "users.id",
             ondelete="CASCADE",
         ),
-        nullable=False,
+        nullable=True,
         index=True,
     )
 

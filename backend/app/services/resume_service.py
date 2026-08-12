@@ -11,13 +11,14 @@ from app.parsers.parser import parse_resume
 from app.scoring.scorer import calculate_ats_score
 from app.services.parsed_resume_service import save_parsed_resume
 from app.models.user import User
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 def create_resume(
     db: Session,
     file: UploadFile,
-    user: User,
+    user: Optional[User] = None,
 ) -> Resume:
     
     """
@@ -29,7 +30,7 @@ def create_resume(
     try:
         
         resume = Resume(
-            user_id=user.id,
+            user_id=user.id if user else None,
             original_filename=file_metadata["original_filename"],
             stored_filename=file_metadata["stored_filename"],
             file_path=file_metadata["file_path"],
@@ -62,7 +63,7 @@ def create_resume(
 def process_uploaded_resume(
     db: Session,
     file: UploadFile,
-    user: User,
+    user: Optional[User] = None,
 ):
     """
     Process an uploaded resume.

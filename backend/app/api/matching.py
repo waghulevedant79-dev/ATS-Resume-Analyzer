@@ -25,13 +25,11 @@ router = APIRouter(
 async def match_resume(
     request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     
     parsed_resume = get_owned_parsed_resume(
         db=db,
         resume_id=request.resume_id,
-        user=current_user,
     )
     
     parsed_job_description = parse_job_description(

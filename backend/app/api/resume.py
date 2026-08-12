@@ -5,7 +5,6 @@ from app.db.database import SessionLocal
 from app.services.resume_service import process_uploaded_resume
 from app.schemas.resume import ProcessResumeResponse
 from app.db.dependencies import get_db
-from app.auth.dependencies import get_current_user
 from app.models.user import User
 
 router = APIRouter(
@@ -22,7 +21,6 @@ router = APIRouter(
 def upload_resume(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
     """
     Upload resume and store its metadata.
@@ -31,7 +29,7 @@ def upload_resume(
     resume = process_uploaded_resume(
             db=db,
             file=file,
-            user=current_user,
+            user=None,
     )
     
     return ProcessResumeResponse (
