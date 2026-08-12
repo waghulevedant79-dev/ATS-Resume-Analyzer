@@ -6,6 +6,7 @@ import logging
 from app.models.resume import Resume
 from app.models.parsed_resume import ResumeParsedData
 from app.schemas.parser import ParsedResume
+from app.models.user import User
 
 
 logger = logging.getLogger(__name__)
@@ -113,3 +114,56 @@ def get_parsed_resume_schema(
         )
 
     return ParsedResume.model_validate(parsed_resume)
+
+
+def get_owned_parsed_resume(
+    db: Session,
+    resume_id: int,
+    user: User,
+) -> ResumeParsedData:
+    """
+    Retrieve parsed resume only when the parent resume
+    belongs to the authenticated user.
+    """
+
+    parsed_resume = (
+        db.query(ResumeParsedData)
+        .join(
+            Resume,
+            Resume.id == ResumeParsedData.resume_id,
+        )
+        .filter(
+            ResumeParsedData.resume_id == resume_id,
+            Resume.user_id == user.id,
+        )
+        .first()
+    )
+
+    if parsed_resume is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found.",
+        )
+
+    return parsed_resume
+
+
+def get_owned_parsed_resume_schema(
+    db: Session,
+    resume_id: int,
+    user: User,
+) -> ParsedResume:
+    """
+    Retrieve and validate a parsed resume belonging
+    to the authenticated user.
+    """
+
+    parsed_resume = get_owned_parsed_resume(
+        db=db,
+        resume_id=resume_id,
+        user=user,
+    )
+
+    return ParsedResume.model_validate(
+        parsed_resume
+    )

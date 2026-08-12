@@ -10,12 +10,14 @@ import os
 from app.parsers.parser import parse_resume
 from app.scoring.scorer import calculate_ats_score
 from app.services.parsed_resume_service import save_parsed_resume
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 
 def create_resume(
     db: Session,
-    file: UploadFile
+    file: UploadFile,
+    user: User,
 ) -> Resume:
     
     """
@@ -27,6 +29,7 @@ def create_resume(
     try:
         
         resume = Resume(
+            user_id=user.id,
             original_filename=file_metadata["original_filename"],
             stored_filename=file_metadata["stored_filename"],
             file_path=file_metadata["file_path"],
@@ -58,7 +61,8 @@ def create_resume(
 
 def process_uploaded_resume(
     db: Session,
-    file: UploadFile
+    file: UploadFile,
+    user: User,
 ):
     """
     Process an uploaded resume.
@@ -74,7 +78,11 @@ def process_uploaded_resume(
     try:
 
         # Save file & metadata
-        resume = create_resume(db, file)
+        resume = create_resume(
+            db=db,
+            file=file,
+            user=user,
+        )
 
         # Parse resume
         parsed_resume = parse_resume(resume.file_path)
@@ -117,3 +125,29 @@ def process_uploaded_resume(
         )
 
 
+def get_owned_resume(
+    db: Session,
+    resume_id: int,
+    user: User,
+) -> Resume:
+    """
+    Retrieve a resume only if it belongs to the
+    authenticated user.
+    """
+
+    resume = (
+        db.query(Resume)
+        .filter(
+            Resume.id == resume_id,
+            Resume.user_id == user.id,
+        )
+        .first()
+    )
+
+    if resume is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Resume not found.",
+        )
+
+    return resume

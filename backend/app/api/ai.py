@@ -22,7 +22,10 @@ from app.schemas.ai import (
 )
 from app.schemas.ai_request import ResumeAIRequest, ProjectEnhancementRequest
 from app.schemas.matching_request import ResumeJobDescriptionRequest
-from app.services.parsed_resume_service import get_parsed_resume_schema
+from app.services.parsed_resume_service import get_owned_parsed_resume_schema
+from app.auth.dependencies import get_current_user
+from app.models.user import User
+
 
 
 ai_service = AIService(GeminiProvider())
@@ -41,15 +44,17 @@ router = APIRouter(
 async def analyze_resume(
     request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     
     # --------------------------------
     # 1. Retrieve Parsed Resume
     # --------------------------------
 
-    parsed_resume = get_parsed_resume_schema(
+    parsed_resume = get_owned_parsed_resume_schema(
         db=db,
         resume_id=request.resume_id,
+        user=current_user,
     )
 
     ats_result = calculate_ats_score(parsed_resume)
@@ -96,12 +101,14 @@ async def analyze_resume(
 def generate_professional_summary(
     request: ResumeAIRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
 
 
-    parsed_resume = get_parsed_resume_schema(
+    parsed_resume = get_owned_parsed_resume_schema(
         db=db,
-        resume_id=request.resume_id
+        resume_id=request.resume_id,
+        user=current_user,
     )
 
     return ai_service.generate_professional_summary(
@@ -118,11 +125,13 @@ def generate_professional_summary(
 def enhance_project(
     request: ProjectEnhancementRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
 
-    parsed_resume = get_parsed_resume_schema(
+    parsed_resume = get_owned_parsed_resume_schema(
     db=db,
     resume_id=request.resume_id,
+    user=current_user,
 )
 
     # Check structured projects
@@ -163,13 +172,15 @@ def enhance_project(
 async def explain_missing_keywords(
     request: ResumeJobDescriptionRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
 
     # 1. Retrieve Parsed Resume
 
-    parsed_resume = get_parsed_resume_schema(
+    parsed_resume = get_owned_parsed_resume_schema(
         db=db,
-        resume_id=request.resume_id
+        resume_id=request.resume_id,
+        user=current_user,
     )
 
 
@@ -208,11 +219,13 @@ async def explain_missing_keywords(
 def rewrite_resume(
     request: ResumeAIRequest,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
 
-    parsed_resume = get_parsed_resume_schema(
+    parsed_resume = get_owned_parsed_resume_schema(
     db=db,
     resume_id=request.resume_id,
+    user=current_user,
 )
 
     result = ai_service.rewrite_resume(

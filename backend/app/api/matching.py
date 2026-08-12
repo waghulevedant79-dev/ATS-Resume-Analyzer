@@ -6,7 +6,10 @@ from app.matching.engine import match_resume_to_job_description
 from app.schemas.matching import MatchResult
 from app.db.dependencies import get_db
 from app.schemas.matching_request import ResumeJobDescriptionRequest
-from app.services.parsed_resume_service import get_parsed_resume
+from app.services.parsed_resume_service import get_owned_parsed_resume
+from app.auth.dependencies import get_current_user
+from app.models.user import User
+
 
 
 router = APIRouter(
@@ -21,12 +24,14 @@ router = APIRouter(
 )
 async def match_resume(
     request: ResumeJobDescriptionRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     
-    parsed_resume = get_parsed_resume(
+    parsed_resume = get_owned_parsed_resume(
         db=db,
-        resume_id=request.resume_id
+        resume_id=request.resume_id,
+        user=current_user,
     )
     
     parsed_job_description = parse_job_description(
