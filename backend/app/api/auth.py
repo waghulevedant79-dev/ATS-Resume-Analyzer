@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_user
@@ -7,26 +7,48 @@ from app.auth.security import (
     hash_password,
     verify_password,
 )
+from app.core.settings import settings
 from app.db.dependencies import get_db
 from app.models.user import User
 from app.schemas.auth import (
     LoginRequest,
     RegisterRequest,
-    TokenResponse,
     UserResponse,
     GoogleLoginRequest,
 )
+
 import secrets
 
 from google.auth.transport import requests
 from google.oauth2 import id_token
-from app.core.settings import settings
 
 
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
+
+
+def set_auth_cookie(
+    response: Response,
+    access_token: str,
+) -> None:
+    response.set_cookie(
+        key=settings.AUTH_COOKIE_NAME,
+        value=access_token,
+        max_age=settings.AUTH_COOKIE_MAX_AGE,
+        httponly=True,
+        secure=settings.AUTH_COOKIE_SECURE,
+        samesite=settings.AUTH_COOKIE_SAMESITE,
+        path="/",
+    )
+
+
+def clear_auth_cookie(response: Response) -> None:
+    response.delete_cookie(
+        key=settings.AUTH_COOKIE_NAME,
+        path="/",
+    )
 
 
 @router.post(
@@ -74,10 +96,11 @@ def register(
 
 @router.post(
     "/login",
-    response_model=TokenResponse,
+    response_model=UserResponse,
 )
 def login(
     data: LoginRequest,
+    response: Response,
     db: Session = Depends(get_db),
 ):
     email = data.email.lower().strip()
@@ -93,28 +116,27 @@ def login(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
-            headers={
-                "WWW-Authenticate": "Bearer",
-            },
         )
 
     access_token = create_access_token(
         user_id=user.id
     )
 
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": user,
-    }
+    set_auth_cookie(
+        response=response,
+        access_token=access_token,
+    )
+
+    return user
 
 
 @router.post(
     "/google",
-    response_model=TokenResponse,
+    response_model=UserResponse,
 )
 def google_login(
     data: GoogleLoginRequest,
+    response: Response,
     db: Session = Depends(get_db),
 ):
     if not settings.GOOGLE_CLIENT_ID:
@@ -184,11 +206,12 @@ def google_login(
         user_id=user.id
     )
 
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user": user,
-    }
+    set_auth_cookie(
+        response=response,
+        access_token=access_token,
+    )
+
+    return user
 
 
 @router.get(
@@ -199,3 +222,15 @@ def get_me(
     current_user: User = Depends(get_current_user),
 ):
     return current_user
+
+
+@router.post(
+    "/logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def logout(
+    response: Response,
+):
+    clear_auth_cookie(response)
+
+    return None

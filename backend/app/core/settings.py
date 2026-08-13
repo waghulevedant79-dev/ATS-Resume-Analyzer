@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     
     GOOGLE_CLIENT_ID: str | None = None
     
+    AUTH_COOKIE_NAME: str = "ats_session"
+    
+    AUTH_COOKIE_SECURE: bool = False
+    
+    AUTH_COOKIE_SAMESITE: str = "lax"
+    
+    AUTH_COOKIE_MAX_AGE: int = 60 * 60 * 24 * 7
+    
     class Config:
         env_file = ".env"
     

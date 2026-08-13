@@ -1,5 +1,4 @@
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException, Request, status
 from jose import JWTError
 from sqlalchemy.orm import Session
 
@@ -8,16 +7,22 @@ from app.db.dependencies import get_db
 from app.models.user import User
 
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/auth/login"
-)
-
-
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    request: Request,
     db: Session = Depends(get_db),
 ) -> User:
-    """Return the authenticated user from the JWT."""
+    """Return the authenticated user from the secure session cookie."""
+
+    token = request.cookies.get("ats_session")
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required.",
+            headers={
+                "WWW-Authenticate": "Bearer",
+            },
+        )
 
     try:
         payload = decode_access_token(token)
@@ -27,7 +32,7 @@ def get_current_user(
         if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authentication credentials",
+                detail="Invalid authentication credentials.",
                 headers={
                     "WWW-Authenticate": "Bearer",
                 },
@@ -38,7 +43,7 @@ def get_current_user(
     except (ValueError, JWTError, TypeError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired authentication token",
+            detail="Invalid or expired authentication session.",
             headers={
                 "WWW-Authenticate": "Bearer",
             },
@@ -51,7 +56,7 @@ def get_current_user(
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
+            detail="User not found.",
             headers={
                 "WWW-Authenticate": "Bearer",
             },
