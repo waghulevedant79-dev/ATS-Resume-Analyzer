@@ -24,6 +24,12 @@ class LoginRequest(BaseModel):
     )
 
 
+class GoogleLoginRequest(BaseModel):
+    credential: str = Field(
+        min_length=1,
+    )
+
+
 class UserResponse(BaseModel):
     id: int
     name: str

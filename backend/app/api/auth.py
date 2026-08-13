@@ -14,7 +14,13 @@ from app.schemas.auth import (
     RegisterRequest,
     TokenResponse,
     UserResponse,
+    GoogleLoginRequest,
 )
+import secrets
+
+from google.auth.transport import requests
+from google.oauth2 import id_token
+from app.core.settings import settings
 
 
 router = APIRouter(
@@ -91,6 +97,88 @@ def login(
                 "WWW-Authenticate": "Bearer",
             },
         )
+
+    access_token = create_access_token(
+        user_id=user.id
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user,
+    }
+
+
+@router.post(
+    "/google",
+    response_model=TokenResponse,
+)
+def google_login(
+    data: GoogleLoginRequest,
+    db: Session = Depends(get_db),
+):
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google authentication is not configured.",
+        )
+
+    try:
+        google_user = id_token.verify_oauth2_token(
+            data.credential,
+            requests.Request(),
+            settings.GOOGLE_CLIENT_ID,
+        )
+
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google authentication credential.",
+        )
+
+    email = google_user.get("email")
+    name = google_user.get("name")
+
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google account email could not be verified.",
+        )
+
+    if not google_user.get("email_verified"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Google account email is not verified.",
+        )
+
+    email = email.lower().strip()
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    if user is None:
+        user = User(
+            name=(name or email.split("@")[0]).strip(),
+            email=email,
+            password=hash_password(
+                secrets.token_urlsafe(32)
+            ),
+        )
+
+        db.add(user)
+
+        try:
+            db.commit()
+            db.refresh(user)
+
+        except Exception:
+            db.rollback()
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Unable to create account.",
+            )
 
     access_token = create_access_token(
         user_id=user.id
