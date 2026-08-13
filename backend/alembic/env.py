@@ -9,6 +9,7 @@ from app.core.settings import settings
 from app.models.user import User
 from app.models.resume import Resume
 from app.models.parsed_resume import ResumeParsedData
+from app.models.deep_ai_usage import DeepAIUsage
 
 from alembic import context
 

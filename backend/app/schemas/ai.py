@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 class ResumeReview(BaseModel):
@@ -65,3 +66,9 @@ class RewrittenResumeResponse(BaseModel):
     certifications: list[str] = Field(
         default_factory=list
     )
+
+class DeepAIUsageResponse(BaseModel):
+    used: int
+    remaining_uses: int
+    limit: int
+    reset_at: datetime

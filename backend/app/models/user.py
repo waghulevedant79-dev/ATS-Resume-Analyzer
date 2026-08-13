@@ -41,3 +41,10 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+
+    deep_ai_usage = relationship(
+        "DeepAIUsage",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
