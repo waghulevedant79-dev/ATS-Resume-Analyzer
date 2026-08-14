@@ -46,9 +46,15 @@ class AIResponseParser:
     def parse_summary(
         raw_response: str,
     ) -> ProfessionalSummaryResponse:
-        
+
+        cleaned_response = AIResponseParser._clean_response(
+            raw_response
+        )
+
         try:
-            data = json.loads(raw_response)
+            data = json.loads(
+                cleaned_response
+            )
 
             return ProfessionalSummaryResponse.model_validate(
                 data

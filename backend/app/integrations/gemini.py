@@ -28,6 +28,7 @@ class GeminiProvider(BaseAIProvider):
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=0.5,
+                    response_mime_type="application/json",
                 )
             )
 
