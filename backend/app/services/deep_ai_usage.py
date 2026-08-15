@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.deep_ai_usage import DeepAIUsage
 
 
-DEEP_AI_USAGE_LIMIT = 5
+DEEP_AI_USAGE_LIMIT = 15
 DEEP_AI_PERIOD_DAYS = 30
 
 

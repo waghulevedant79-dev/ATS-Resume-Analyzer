@@ -1,4 +1,5 @@
-from app.integrations.gemini import gemini_provider
+# from app.integrations.gemini import gemini_provider
+from app.integrations.providers.manager import ai_provider
 from app.ai.builders.analysis_builder import AnalysisBuilder
 from app.integrations.providers.base import BaseAIProvider
 from app.ai.response_parser import AIResponseParser
@@ -54,7 +55,10 @@ class AIService:
         
         prompt = AnalysisBuilder.build(context)
         
-        raw_response = self.provider.generate(prompt)
+        raw_response = self.provider.generate(
+            prompt,
+            response_schema=AIAnalysisResponse,
+        )
         
         return AIResponseParser.parse_analysis(raw_response)
     
@@ -169,4 +173,4 @@ class AIService:
 
 
 
-ai_service = AIService(gemini_provider)
+ai_service = AIService(ai_provider)

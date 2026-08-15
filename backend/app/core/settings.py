@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     
     GEMINI_MODEL: str = "gemini-2.5-flash"
     
+    OPENROUTER_API_KEY: str
+    
+    NVIDIA_MODEL: str = "nvidia/nemotron-3.5-lightning:free"
+    
     GOOGLE_CLIENT_ID: str | None = None
     
     AUTH_COOKIE_NAME: str = "ats_session"

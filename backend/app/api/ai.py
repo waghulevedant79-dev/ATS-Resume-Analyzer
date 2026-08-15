@@ -4,9 +4,7 @@ from fastapi import (
     HTTPException,
 )
 from sqlalchemy.orm import Session
-
-from app.ai.service import AIService
-from app.integrations.gemini import GeminiProvider
+from app.ai.service import ai_service
 
 from app.job_description.parser import parse_job_description
 from app.matching.engine import match_resume_to_job_description
@@ -39,7 +37,6 @@ from app.services.deep_ai_usage import (
 )
 
 
-ai_service = AIService(GeminiProvider())
 
 
 router = APIRouter(
