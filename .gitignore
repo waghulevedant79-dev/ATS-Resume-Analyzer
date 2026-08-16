@@ -12,6 +12,3 @@ node_modules/
 
 # Logs
 *.log
-
-# User uploaded resumes
-backend/uploads/
