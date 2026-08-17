@@ -27,7 +27,10 @@ def home():
     return {
         f"Welcome to our project, {settings.PROJECT_NAME} "
     }
-    
+
+@app.get("/healthz")
+def health_check():
+    return {"status": "ok"}
 
 app.include_router(resume_router)
 app.include_router(match_router)
