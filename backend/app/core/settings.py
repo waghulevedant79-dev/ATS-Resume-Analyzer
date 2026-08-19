@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     DEBUG: bool = False
 
+    FRONTEND_URL: str = "http://localhost:5173"
+
     B2_ENDPOINT_URL: str
 
     B2_ACCESS_KEY_ID: str
