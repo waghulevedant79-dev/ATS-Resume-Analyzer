@@ -31,16 +31,16 @@ def match_skills(
     remaining_jd_skills = jd_skills - matched_skills
     
     resume_embeddings = dict(
-    zip(
-        remaining_resume_skills,
-        encoder.encode_batch(list(remaining_resume_skills))
+        zip(
+            remaining_resume_skills,
+            encoder.encode_batch(list(remaining_resume_skills)),
         )
     )
 
     jd_embeddings = dict(
         zip(
             remaining_jd_skills,
-            encoder.encode_batch(list(remaining_jd_skills))
+            encoder.encode_batch(list(remaining_jd_skills)),
         )
     )
     
